@@ -717,14 +717,14 @@ class TadoClimate(TadoZoneEntity, ClimateEntity):
         if duration:
             overlay_mode = CONST_OVERLAY_TIMER
         # If no duration or timer set to fallback setting
-        _LOGGER.error(overlay_mode)
+
         if overlay_mode is None:
             overlay_mode = (
                 self._tado.fallback
                 if self._tado.fallback is not None
                 else CONST_OVERLAY_TADO_MODE
             )
-        _LOGGER.error(overlay_mode)
+
         # If default is Tado default then look it up
         if overlay_mode == CONST_OVERLAY_TADO_DEFAULT:
             overlay_mode = (
