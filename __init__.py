@@ -22,10 +22,14 @@ from .const import (
     CONST_OVERLAY_TADO_DEFAULT,
     CONST_OVERLAY_TADO_MODE,
     CONST_OVERLAY_TADO_OPTIONS,
+    CURRENT_PRESET_MODE,
     DATA,
     DOMAIN,
     INSIDE_TEMPERATURE_MEASUREMENT,
+    NUMBER_OF_PRESET_MODES,
+    PRESET_MODES,
     SIGNAL_TADO_UPDATE_RECEIVED,
+    STORE,
     TEMP_OFFSET,
     UPDATE_LISTENER,
     UPDATE_TRACK,
@@ -37,8 +41,10 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [
     Platform.BINARY_SENSOR,
     Platform.CLIMATE,
+    Platform.NUMBER,
     Platform.SENSOR,
-    Platform.WATER_HEATER,
+    Platform.SELECT,
+    Platform.TEXT,
 ]
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=4)
@@ -84,6 +90,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         SCAN_INTERVAL,
     )
 
+    preset_mode_store = {
+        PRESET_MODES: {
+            i: {
+                "name": f"Tado preset mode {i} name",
+                "fanSpeed": "AUTO",
+                "verticalSwing": "ON",
+                "horizontalSwing": "ON",
+                "temperature": 21,
+            }
+            for i in range(1, NUMBER_OF_PRESET_MODES + 1)
+        },
+        CURRENT_PRESET_MODE: None,
+    }
+
     update_listener = entry.add_update_listener(_async_update_listener)
 
     hass.data.setdefault(DOMAIN, {})
@@ -91,6 +111,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         DATA: tadoconnector,
         UPDATE_TRACK: update_track,
         UPDATE_LISTENER: update_listener,
+        STORE: preset_mode_store,
     }
 
     hass.config_entries.async_setup_platforms(entry, PLATFORMS)
@@ -280,7 +301,7 @@ class TadoConnector:
         fan_speed=None,
         vertical_swing=None,
         horizontal_swing=None,
-        light=None
+        light=None,
     ):
         """Set a zone overlay."""
         _LOGGER.debug(
@@ -321,7 +342,11 @@ class TadoConnector:
         """Set a zone to off."""
         try:
             self.tado.setZoneOverlay(
-                zone=zone_id, overlayMode=overlay_mode, deviceType=device_type, power="OFF", mode='AUTO'
+                zone=zone_id,
+                overlayMode=overlay_mode,
+                deviceType=device_type,
+                power="OFF",
+                mode="AUTO",
             )
         except RequestException as exc:
             _LOGGER.error("Could not set zone overlay: %s", exc)

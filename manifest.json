@@ -3,12 +3,9 @@
     "name": "Tado",
     "version": "0.0.1",
     "documentation": "https://www.home-assistant.io/integrations/tado",
-    "requirements": ["PyTado @ git+https://github.com/simonepsp/PyTado.git"],
+    "requirements": ["PyTado @ git+https://github.com/wesley-vos/PyTado.git"],
     "codeowners": ["@michaelarnauts", "@north3221"],
     "config_flow": true,
-    "homekit": {
-        "models": ["tado", "AC02"]
-    },
     "dhcp": [{
         "hostname": "tado*"
     }],
