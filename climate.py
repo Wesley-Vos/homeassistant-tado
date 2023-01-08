@@ -482,7 +482,31 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         # if self._tado_zone_data.is_away:
         #     return PRESET_AWAY
         # return PRESET_HOME
-        return self.store[CURRENT_PRESET_MODE]
+        for mode in self.store[PRESET_MODES].values():
+            is_mode = True
+            is_mode = is_mode and mode[TEMPERATURE] == self.current_temperature
+            is_mode = (
+                is_mode
+                and mode[HORIZONTAL_SWING_MODE]
+                == self._current_tado_horizontal_swing_mode
+            )
+            is_mode = (
+                is_mode
+                and mode[VERTICAL_SWING_MODE] == self._current_tado_vertical_swing_mode
+            )
+            is_mode = (
+                is_mode
+                and HA_TO_TADO_FAN_MODE_MAP[mode[FANSPEED]]
+                == self._current_tado_fan_speed
+            )
+
+            _LOGGER.error(
+                f"{mode} {HA_TO_TADO_FAN_MODE_MAP[mode[FANSPEED]] } { self.current_temperature }, { self._current_tado_vertical_swing_mode}, { self._current_tado_horizontal_swing_mode }, { self._current_tado_fan_speed }"
+            )
+            if is_mode:
+                return mode[NAME]
+
+        # return self.store[CURRENT_PRESET_MODE]
 
     @property
     def preset_modes(self):
