@@ -471,7 +471,9 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
     @property
     def fan_modes(self):
         """List of available fan modes."""
-        return self._current_capabilities["fan_speeds"]
+        modes = self._current_capabilities["fan_speeds"]
+        modes.sort()
+        return modes
 
     def set_fan_mode(self, fan_mode: str):
         """Turn fan on/off."""
