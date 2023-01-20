@@ -319,7 +319,6 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         """Initialize of Tado climate entity."""
         self._tado = tado
         self.store = store
-        _LOGGER.error(store)
         super().__init__(zone_name, tado.home_id, zone_id)
 
         self.zone_id = zone_id
@@ -358,6 +357,8 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         self._tado_zone_data = None
 
         self._tado_zone_temp_offset = {}
+
+        self._preset_mode = None
 
         self._async_update_zone_data()
 
@@ -470,11 +471,14 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
     @property
     def fan_modes(self):
         """List of available fan modes."""
-        return self._current_capabilities["fan_speeds"]
+        modes = self._current_capabilities["fan_speeds"]
+        modes.sort()
+        return modes
 
     def set_fan_mode(self, fan_mode: str):
         """Turn fan on/off."""
         self._control_hvac(fan_mode=HA_TO_TADO_FAN_MODE_MAP[fan_mode])
+        self.determine_preset_mode()
 
     @property
     def preset_mode(self):
@@ -482,6 +486,20 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         # if self._tado_zone_data.is_away:
         #     return PRESET_AWAY
         # return PRESET_HOME
+        self.determine_preset_mode()
+        return self.store[CURRENT_PRESET_MODE]
+
+        # return self.store[CURRENT_PRESET_MODE]
+
+    @property
+    def preset_modes(self):
+        """Return a list of available preset modes."""
+        # return SUPPORT_PRESET
+        return [mode[NAME] for mode in self.store[PRESET_MODES].values()]
+
+    def determine_preset_mode(self) -> str | None:
+        """Method to determine preset mode"""
+        self.store[CURRENT_PRESET_MODE] = None
         for mode in self.store[PRESET_MODES].values():
             is_mode = True
             is_mode = is_mode and mode[TEMPERATURE] == self.target_temperature
@@ -494,25 +512,17 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
                 is_mode
                 and mode[VERTICAL_SWING_MODE] == self._current_tado_vertical_swing_mode
             )
-            is_mode = (
-                is_mode
-                and HA_TO_TADO_FAN_MODE_MAP[mode[FANSPEED]]
-                == self._current_tado_fan_speed
-            )
+            is_mode = is_mode and mode[FANSPEED] == self.fan_mode
 
             _LOGGER.error(
-                f"{mode} {HA_TO_TADO_FAN_MODE_MAP[mode[FANSPEED]] } { self.target_temperature }, { self._current_tado_vertical_swing_mode}, { self._current_tado_horizontal_swing_mode }, { self._current_tado_fan_speed }"
+                f"DETERMINE preset mode {mode} { self.fan_mode } { self._current_tado_vertical_swing_mode}, { self._current_tado_horizontal_swing_mode },  { self.target_temperature }"
             )
+            # _LOGGER.error(
+            #     f"{mode[TEMPERATURE] == self.target_temperature} { mode[VERTICAL_SWING_MODE] == self._current_tado_vertical_swing_mode} { mode[HORIZONTAL_SWING_MODE] == self._current_tado_horizontal_swing_mode} { mode[FANSPEED] == self.fan_mode } { is_mode }"
+            # )
             if is_mode:
-                return mode[NAME]
-
-        # return self.store[CURRENT_PRESET_MODE]
-
-    @property
-    def preset_modes(self):
-        """Return a list of available preset modes."""
-        # return SUPPORT_PRESET
-        return [mode[NAME] for mode in self.store[PRESET_MODES].values()]
+                self.store[CURRENT_PRESET_MODE] = mode[NAME]
+                break
 
     def set_preset_mode(self, preset_mode):
         """Set new preset mode."""
@@ -597,6 +607,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
 
         new_hvac_mode = CONST_MODE_HEAT
         self._control_hvac(target_temp=temperature, hvac_mode=new_hvac_mode)
+        self.determine_preset_mode()
 
     def turn_off(self):
         """Switch zone off."""
@@ -670,6 +681,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         self._control_hvac(
             vertical_swing=vertical_swing, horizontal_swing=horizontal_swing
         )
+        self.determine_preset_mode()
 
     @callback
     def _async_update_zone_data(self):
