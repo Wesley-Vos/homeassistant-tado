@@ -1,6 +1,8 @@
 """Support for Tado sensors for each zone."""
 import logging
 
+from datetime import datetime
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -37,12 +39,16 @@ ZONE_SENSORS = {
         "humidity",
         "heating",
         "tado mode",
+        "overlay termination type",
+        "overlay termination time",
     ],
     TYPE_AIR_CONDITIONING: [
         "temperature",
         "humidity",
         "ac",
         "tado mode",
+        "overlay termination type",
+        "overlay termination time"
     ],
     TYPE_HOT_WATER: ["tado mode"],
 }
@@ -264,6 +270,8 @@ class TadoZoneSensor(TadoZoneEntity, SensorEntity):
             return SensorDeviceClass.HUMIDITY
         if self.zone_variable == "temperature":
             return SensorDeviceClass.TEMPERATURE
+        if self.zone_variable == "overlay termination time":
+            return SensorDeviceClass.TIMESTAMP
         return None
 
     @property
@@ -312,3 +320,9 @@ class TadoZoneSensor(TadoZoneEntity, SensorEntity):
 
         elif self.zone_variable == "tado mode":
             self._state = self._tado_zone_data.tado_mode
+
+
+        elif self.zone_variable == "overlay termination type":
+            self._state = self._tado_zone_data.overlay_termination_type
+        elif self.zone_variable == "overlay termination time":
+            self._state = None if self._tado_zone_data.overlay_termination_type is None else datetime.strptime(self._tado_zone_data.overlay_termination_time, "%Y-%m-%dT%H:%M:%S%z")
