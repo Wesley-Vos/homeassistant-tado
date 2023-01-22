@@ -323,6 +323,7 @@ class TadoZoneSensor(TadoZoneEntity, SensorEntity):
 
 
         elif self.zone_variable == "overlay termination type":
+            _LOGGER.error(self._tado_zone_data.overlay_termination_time)
             self._state = self._tado_zone_data.overlay_termination_type
         elif self.zone_variable == "overlay termination time":
-            self._state = None if self._tado_zone_data.overlay_termination_type is None else datetime.strptime(self._tado_zone_data.overlay_termination_time, "%Y-%m-%dT%H:%M:%S%z")
+            self._state = None if self._tado_zone_data.overlay_termination_time is None else datetime.strptime(self._tado_zone_data.overlay_termination_time, "%Y-%m-%dT%H:%M:%S%z")

@@ -807,11 +807,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         # If no duration or timer set to fallback setting
 
         if overlay_mode is None:
-            overlay_mode = (
-                self._tado.fallback
-                if self._tado.fallback is not None
-                else CONST_OVERLAY_TADO_MODE
-            )
+            overlay_mode = "NEXT_TIME_BLOCK"
 
         # If default is Tado default then look it up
         if overlay_mode == CONST_OVERLAY_TADO_DEFAULT:
