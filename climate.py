@@ -789,7 +789,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
             _LOGGER.debug(
                 "Switching to OFF for zone %s (%d)", self.zone_name, self.zone_id
             )
-            self._tado.set_zone_off(self.zone_id, CONST_OVERLAY_MANUAL, self.zone_type)
+            self._tado.set_zone_off(self.zone_id, CONST_OVERLAY_TADO_MODE, self.zone_type)
             return
 
         if self._current_tado_hvac_mode == CONST_MODE_SMART_SCHEDULE:
