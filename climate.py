@@ -514,9 +514,9 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
             )
             is_mode = is_mode and mode[FANSPEED] == self.fan_mode
 
-            _LOGGER.error(
-                f"DETERMINE preset mode {mode} { self.fan_mode } { self._current_tado_vertical_swing_mode}, { self._current_tado_horizontal_swing_mode },  { self.target_temperature }"
-            )
+            # _LOGGER.error(
+            #     f"DETERMINE preset mode {mode} { self.fan_mode } { self._current_tado_vertical_swing_mode}, { self._current_tado_horizontal_swing_mode },  { self.target_temperature }"
+            # )
             # _LOGGER.error(
             #     f"{mode[TEMPERATURE] == self.target_temperature} { mode[VERTICAL_SWING_MODE] == self._current_tado_vertical_swing_mode} { mode[HORIZONTAL_SWING_MODE] == self._current_tado_horizontal_swing_mode} { mode[FANSPEED] == self.fan_mode } { is_mode }"
             # )
@@ -537,9 +537,9 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
 
         new_hvac_mode = CONST_MODE_HEAT
         new_fan_mode = HA_TO_TADO_FAN_MODE_MAP[preset_mode_obj[FANSPEED]]
-        _LOGGER.error(
-            f"Set hvac to temp: {preset_mode_obj[TEMPERATURE]}, verticalSwing: { preset_mode_obj[VERTICAL_SWING_MODE] }, horizontalSwing: { preset_mode_obj[HORIZONTAL_SWING_MODE] }, fanMode: { new_fan_mode } and hvacMode: { new_hvac_mode }"
-        )
+        # _LOGGER.error(
+        #     f"Set hvac to temp: {preset_mode_obj[TEMPERATURE]}, verticalSwing: { preset_mode_obj[VERTICAL_SWING_MODE] }, horizontalSwing: { preset_mode_obj[HORIZONTAL_SWING_MODE] }, fanMode: { new_fan_mode } and hvacMode: { new_hvac_mode }"
+        # )
         self._control_hvac(
             target_temp=preset_mode_obj[TEMPERATURE],
             vertical_swing=preset_mode_obj[VERTICAL_SWING_MODE],
@@ -548,7 +548,7 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
             hvac_mode=new_hvac_mode,
         )
 
-        _LOGGER.error(f"Set preset mode to { preset_mode }")
+        # _LOGGER.error(f"Set preset mode to { preset_mode }")
 
     @property
     def temperature_unit(self):
@@ -789,7 +789,9 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
             _LOGGER.debug(
                 "Switching to OFF for zone %s (%d)", self.zone_name, self.zone_id
             )
-            self._tado.set_zone_off(self.zone_id, CONST_OVERLAY_TADO_MODE, self.zone_type)
+            self._tado.set_zone_off(
+                self.zone_id, CONST_OVERLAY_TADO_MODE, self.zone_type
+            )
             return
 
         if self._current_tado_hvac_mode == CONST_MODE_SMART_SCHEDULE:
