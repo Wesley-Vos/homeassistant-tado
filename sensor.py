@@ -48,7 +48,7 @@ ZONE_SENSORS = {
         "ac",
         "tado mode",
         "overlay termination type",
-        "overlay termination time"
+        "overlay termination time",
     ],
     TYPE_HOT_WATER: ["tado mode"],
 }
@@ -277,7 +277,7 @@ class TadoZoneSensor(TadoZoneEntity, SensorEntity):
     @property
     def state_class(self):
         """Return the state class."""
-        if self.zone_variable in ["ac", "heating", "humidity", "temperature"]:
+        if self.zone_variable in ["heating", "humidity", "temperature"]:
             return SensorStateClass.MEASUREMENT
         return None
 
@@ -321,8 +321,13 @@ class TadoZoneSensor(TadoZoneEntity, SensorEntity):
         elif self.zone_variable == "tado mode":
             self._state = self._tado_zone_data.tado_mode
 
-
         elif self.zone_variable == "overlay termination type":
             self._state = self._tado_zone_data.overlay_termination_type
         elif self.zone_variable == "overlay termination time":
-            self._state = None if self._tado_zone_data.overlay_termination_time is None else datetime.strptime(self._tado_zone_data.overlay_termination_time, "%Y-%m-%dT%H:%M:%S%z")
+            self._state = (
+                None
+                if self._tado_zone_data.overlay_termination_time is None
+                else datetime.strptime(
+                    self._tado_zone_data.overlay_termination_time, "%Y-%m-%dT%H:%M:%S%z"
+                )
+            )
