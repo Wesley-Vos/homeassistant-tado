@@ -248,7 +248,7 @@ TADO_TO_HA_OFFSET_MAP = {
 HA_TERMINATION_TYPE = "default_overlay_type"
 HA_TERMINATION_DURATION = "default_overlay_seconds"
 
-NUMBER_OF_PRESET_MODES = 2
+NUMBER_OF_PRESET_MODES = 4
 
 CURRENT_PRESET_MODE = "current_preset_mode"
 PRESET_MODES = "preset_modes"
