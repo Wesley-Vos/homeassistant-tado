@@ -5,8 +5,7 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.components.climate import ClimateEntity
-from homeassistant.components.climate.const import (
+from homeassistant.components.climate import (
     FAN_AUTO,
     PRESET_AWAY,
     PRESET_HOME,
@@ -14,6 +13,7 @@ from homeassistant.components.climate.const import (
     SWING_HORIZONTAL,
     SWING_BOTH,
     SWING_OFF,
+    ClimateEntity,
     ClimateEntityFeature,
     HVACAction,
     HVACMode,
@@ -759,7 +759,6 @@ class TadoClimate(TadoZoneEntity, ClimateEntity, RestoreEntity):
         duration=None,
         overlay_mode=None,
     ):
-
         if hvac_mode:
             self._current_tado_hvac_mode = hvac_mode
 
